@@ -1,0 +1,82 @@
+# DeafAUTH Universal Authentication Service
+# GCP Project: mbtq.dev
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deafauth-config
+data:
+  # Core DeafAUTH Configuration
+  DEAFAUTH_API_URL: "https://deafauth.mbtq.dev"
+  DEAFAUTH_ADMIN_URL: "https://admin.deafauth.mbtq.dev"
+  DEAFAUTH_CDN_URL: "https://cdn.deafauth.mbtq.dev"
+  
+  # Supported Domains
+  SUPPORTED_DOMAINS: |
+    mbtquniverse.com,
+    360magicians.com,
+    pinksync.io,
+    *.startup.com,
+    *.university.edu,
+    *.nonprofit.org
+  
+  # Identity Verification Levels
+  VERIFICATION_LEVELS: |
+    self-reported,
+    community-verified,
+    organization-verified,
+    certified-professional
+  
+  # Sign Language Support
+  SUPPORTED_SIGN_LANGUAGES: |
+    ASL,BSL,JSL,LSF,DGS,Auslan,NZSL,ISL,CSL,RSL,LSE,LIS,ÖGS,VGT,NGT,SLN,SSL,TSL,KSL,HKSL,MSL,PSL,LSQ,LSM,LSFB,LIU,LSC,LSV,LSU,LSCO,LSP,LSB,LIBRAS,LSA,LSCh,LSE,LSV,LESCO,LSN,LSH,LSG,LSPR,LSC,LSV,LSU
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deafauth-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: deafauth-api
+  template:
+    metadata:
+      labels:
+        app: deafauth-api
+    spec:
+      containers:
+      - name: deafauth-api
+        image: gcr.io/mbtq-dev/deafauth-api:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: GCP_PROJECT_ID
+          value: "mbtq.dev"
+        - name: FIRESTORE_DATABASE
+          value: "deafauth-profiles"
+        - name: REDIS_URL
+          value: "redis://deafauth-redis:6379"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deafauth-api-service
+spec:
+  selector:
+    app: deafauth-api
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer

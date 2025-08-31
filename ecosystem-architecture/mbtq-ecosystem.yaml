@@ -1,0 +1,137 @@
+# MBTQ Deaf-First AI Ecosystem Architecture
+# GCP Project: mbtq.dev
+
+# Core Infrastructure
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mbtq-ecosystem-config
+data:
+  # 🎨 360magicians.com - Vertex AI Multi-Domain Hub
+  VERTEX_AI_ENDPOINTS: |
+    creative-ai.360magicians.com,
+    design-ai.360magicians.com,
+    content-ai.360magicians.com,
+    accessibility-ai.360magicians.com
+  
+  # 🔄 pinksync.io - Accessibility AI Middleware
+  PINKSYNC_SERVICES: |
+    ai-transformation,
+    accessibility-layer,
+    data-synchronization,
+    offline-sync,
+    cross-platform-delivery
+  
+  # 🏠 mbtq.dev - Deaf-First Platform (v0 + Gemini Integration)
+  MBTQ_SERVICES: |
+    v0-studio-integration,
+    gemini-cli-bridge,
+    deaf-first-ui-dashboard,
+    ai-google-studio-proxy
+  
+  # 🌌 mbtquniverse.com - DAO + Web3 + Staking
+  UNIVERSE_SERVICES: |
+    dao-governance,
+    web3-staking,
+    showcase-projects,
+    community-treasury
+  
+  # 🔐 DeafAUTH - Universal Identity Layer
+  DEAFAUTH_INTEGRATION: |
+    cross-ecosystem-auth,
+    accessibility-preferences,
+    ai-personalization,
+    community-verification
+
+---
+# 360magicians.com - Vertex AI Multi-Domain Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vertex-ai-hub
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: vertex-ai-hub
+  template:
+    metadata:
+      labels:
+        app: vertex-ai-hub
+    spec:
+      containers:
+      - name: vertex-ai-hub
+        image: gcr.io/mbtq-dev/360magicians-vertex-ai:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: VERTEX_AI_PROJECT
+          value: "mbtq.dev"
+        - name: VERTEX_AI_LOCATION
+          value: "us-central1"
+        - name: DEAFAUTH_INTEGRATION
+          value: "enabled"
+        - name: ACCESSIBILITY_FIRST
+          value: "true"
+
+---
+# pinksync.io - Accessibility AI Middleware
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pinksync-middleware
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pinksync-middleware
+  template:
+    metadata:
+      labels:
+        app: pinksync-middleware
+    spec:
+      containers:
+      - name: pinksync-middleware
+        image: gcr.io/mbtq-dev/pinksync-accessibility:latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: DEAFAUTH_API_URL
+          value: "https://deafauth.mbtq.dev"
+        - name: VERTEX_AI_ENDPOINT
+          value: "https://api.360magicians.com"
+        - name: OFFLINE_SYNC_ENABLED
+          value: "true"
+        - name: ACCESSIBILITY_TRANSFORMS
+          value: "visual,tactile,sign-language,high-contrast"
+
+---
+# mbtq.dev - Deaf-First Platform
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mbtq-platform
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: mbtq-platform
+  template:
+    metadata:
+      labels:
+        app: mbtq-platform
+    spec:
+      containers:
+      - name: mbtq-platform
+        image: gcr.io/mbtq-dev/mbtq-platform:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: V0_STUDIO_INTEGRATION
+          value: "enabled"
+        - name: GEMINI_CLI_BRIDGE
+          value: "enabled"
+        - name: AI_GOOGLE_STUDIO_PROXY
+          value: "enabled"
+        - name: DEAF_FIRST_UI
+          value: "true"
